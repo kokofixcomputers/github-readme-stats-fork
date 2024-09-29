@@ -1,7 +1,7 @@
 // @ts-check
 import { Card } from "../common/Card.js";
+import { createProgressNode } from "../common/createProgressNode.js"; // Correct import path
 import { I18n } from "../common/I18n.js";
-import { icons } from "../common/icons.js";
 import {
   encodeHTML,
   flexLayout,
@@ -13,13 +13,27 @@ import {
   iconWithLabel,
   createLanguageNode,
   clampValue,
-  createProgressNode // Import animation utility
 } from "../common/utils.js";
 import { repoCardLocales } from "../translations.js";
 
 const ICON_SIZE = 16;
 const DESCRIPTION_LINE_WIDTH = 59;
 const DESCRIPTION_MAX_LINES = 3;
+
+const getBadgeSVG = (label, textColor) => `
+  <g data-testid="badge" class="badge" transform="translate(320, -18)">
+    <rect stroke="${textColor}" stroke-width="1" width="70" height="20" x="-12" y="-14" ry="10" rx="10"></rect>
+    <text
+      x="23" y="-5"
+      alignment-baseline="central"
+      dominant-baseline="central"
+      text-anchor="middle"
+      fill="${textColor}"
+    >
+      ${label}
+    </text>
+  </g>
+`;
 
 const renderRepoCard = (repo, options = {}) => {
   const {
@@ -49,7 +63,7 @@ const renderRepoCard = (repo, options = {}) => {
 
   const lineHeight = 10;
   const header = show_owner ? nameWithOwner : name;
-  
+
   const langName = (primaryLanguage && primaryLanguage.name) || "Unspecified";
   const langColor = (primaryLanguage && primaryLanguage.color) || "#333";
 
@@ -126,6 +140,13 @@ const renderRepoCard = (repo, options = {}) => {
 
    return card.render(`
      <g>
+       ${
+         isTemplate
+           ? getBadgeSVG(i18n.t("repocard.template"), colors.textColor)
+           : isArchived
+             ? getBadgeSVG(i18n.t("repocard.archived"), colors.textColor)
+             : ""
+       }
        <text class="description" x="25" y="-5">
          ${descriptionSvg}
        </text>
