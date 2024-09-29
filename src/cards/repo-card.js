@@ -84,8 +84,9 @@ const renderRepoCard = (repo, options = {}) => {
     .map((line) => `<tspan dy="1.2em" x="25">${encodeHTML(line)}</tspan>`)
     .join("");
 
+  // Adjust height calculation to ensure all elements fit
   const height =
-    (descriptionMaxLines > 1 ? 120 : 110) + descriptionMaxLines * lineHeight;
+    (descriptionMaxLines > 1 ? 120 : 110) + descriptionMaxLines * lineHeight + 50; // Added extra space
 
   const i18n = new I18n({
     locale,
@@ -131,7 +132,7 @@ const renderRepoCard = (repo, options = {}) => {
      defaultTitle: header.length > 35 ? `${header.slice(0,35)}...` : header,
      titlePrefixIcon: icons.contribs, // Use appropriate icon for contributors
      width: 400,
-     height: height,
+     height: height, // Ensure height includes space for all elements
      border_radius: border_radius || undefined, // Ensure border radius is set correctly
      colors
    });
