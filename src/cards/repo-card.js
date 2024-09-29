@@ -50,10 +50,10 @@ const renderRepoCard = (repo, options = {}) => {
 
   const {
     hide_border = false,
-    title_color,
-    icon_color,
-    text_color,
-    bg_color,
+    title_color = "#000", // Default title color
+    icon_color = "#000", // Default icon color
+    text_color = "#000", // Default text color
+    bg_color = "#fff", // Default background color
     show_owner = false,
     theme = "default_repocard",
     border_radius,
@@ -149,12 +149,12 @@ const renderRepoCard = (repo, options = {}) => {
              ? getBadgeSVG(i18n.t("repocard.archived"), colors.textColor)
              : ""
        }
-       <text class="description" x="25" y="-5">
+       <text class="description" x="25" y="-5" fill="${colors.textColor}">
          ${descriptionSvg}
        </text>
        <g transform="translate(30, ${height -75})">
-         ${svgStars.replace('stargazers', `stargazers" style="animation-delay:${starAnimationDelay(0)}ms;`)}
-         ${svgForks.replace('forkcount', `forkcount" style="animation-delay:${starAnimationDelay(1)}ms;`)}
+         ${svgStars.replace('stargazers', `stargazers" style="animation-delay:${starAnimationDelay(0)}ms; fill:${colors.iconColor};`)}
+         ${svgForks.replace('forkcount', `forkcount" style="animation-delay:${starAnimationDelay(1)}ms; fill:${colors.iconColor};`)}
        </g>
      </g>
    `);
