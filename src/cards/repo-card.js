@@ -13,27 +13,13 @@ import {
   iconWithLabel,
   createLanguageNode,
   clampValue,
+  createProgressNode // Import animation utility
 } from "../common/utils.js";
 import { repoCardLocales } from "../translations.js";
 
 const ICON_SIZE = 16;
 const DESCRIPTION_LINE_WIDTH = 59;
 const DESCRIPTION_MAX_LINES = 3;
-
-const getBadgeSVG = (label, textColor) => `
-  <g data-testid="badge" class="badge" transform="translate(320, -18)">
-    <rect stroke="${textColor}" stroke-width="1" width="70" height="20" x="-12" y="-14" ry="10" rx="10"></rect>
-    <text
-      x="23" y="-5"
-      alignment-baseline="central"
-      dominant-baseline="central"
-      text-anchor="middle"
-      fill="${textColor}"
-    >
-      ${label}
-    </text>
-  </g>
-`;
 
 const renderRepoCard = (repo, options = {}) => {
   const {
@@ -46,7 +32,7 @@ const renderRepoCard = (repo, options = {}) => {
     starCount,
     forkCount,
   } = repo;
-  
+
   const {
     hide_border = false,
     title_color,
@@ -79,17 +65,12 @@ const renderRepoCard = (repo, options = {}) => {
     descriptionMaxLines
   );
 
-  const descriptionLinesCount = description_lines_count
-    ? clampValue(description_lines_count, 1, DESCRIPTION_MAX_LINES)
-    : multiLineDescription.length;
-
   const descriptionSvg = multiLineDescription
     .map((line) => `<tspan dy="1.2em" x="25">${encodeHTML(line)}</tspan>`)
     .join("");
 
   const height =
-    (descriptionLinesCount > 1 ? 120 : 110) +
-    descriptionLinesCount * lineHeight;
+    (descriptionMaxLines > 1 ? 120 : 110) + descriptionMaxLines * lineHeight;
 
   const i18n = new I18n({
     locale,
@@ -104,10 +85,6 @@ const renderRepoCard = (repo, options = {}) => {
     border_color,
     theme
   });
-
-  const svgLanguage = primaryLanguage
-    ? createLanguageNode(langName, langColor)
-    : "";
 
   const totalStars = kFormatter(starCount);
   const totalForks = kFormatter(forkCount);
@@ -127,9 +104,8 @@ const renderRepoCard = (repo, options = {}) => {
   );
 
   const starAndForkCount = flexLayout({
-      items: [svgLanguage, svgStars, svgForks],
+      items: [svgStars, svgForks],
       sizes: [
-        measureText(langName, 12),
         ICON_SIZE + measureText(`${totalStars}`, 12),
         ICON_SIZE + measureText(`${totalForks}`, 12),
       ],
@@ -145,34 +121,18 @@ const renderRepoCard = (repo, options = {}) => {
      colors
    });
 
-   // Enable animations for the card
-   card.enableAnimations(); // Change this line to enable animations
-
-   card.setHideBorder(hide_border);
-   card.setHideTitle(false);
-   card.setCSS(`
-     .description { font:400 13px 'Segoe UI', Ubuntu, Sans-Serif; fill: ${colors.textColor} }
-     .gray { font:400 12px 'Segoe UI', Ubuntu, Sans-Serif; fill: ${colors.textColor} }
-     .icon { fill: ${colors.iconColor} }
-     .badge { font:600 11px 'Segoe UI', Ubuntu, Sans-Serif; }
-     .badge rect { opacity:0.2 }
-   `);
+   // Add animations for the stars and forks count
+   const starAnimationDelay = (index) => (index + 1) * 150; // Example staggered delay
 
    return card.render(`
-     ${
-       isTemplate
-         ? getBadgeSVG(i18n.t("repocard.template"), colors.textColor)
-         : isArchived
-           ? getBadgeSVG(i18n.t("repocard.archived"), colors.textColor)
-           : ""
-     }
-
-     <text class="description" x="25" y="-5">
-       ${descriptionSvg}
-     </text>
-
-     <g transform="translate(30, ${height -75})">
-       ${starAndForkCount}
+     <g>
+       <text class="description" x="25" y="-5">
+         ${descriptionSvg}
+       </text>
+       <g transform="translate(30, ${height -75})">
+         ${svgStars.replace('stargazers', `stargazers" style="animation-delay:${starAnimationDelay(0)}ms;`)}
+         ${svgForks.replace('forkcount', `forkcount" style="animation-delay:${starAnimationDelay(1)}ms;`)}
+       </g>
      </g>
    `);
 };
