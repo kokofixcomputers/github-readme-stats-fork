@@ -2,6 +2,7 @@
 import { Card } from "../common/Card.js";
 import { createProgressNode } from "../common/createProgressNode.js"; // Correct import path
 import { I18n } from "../common/I18n.js";
+import { icons } from "../common/icons.js"; // Import icons here
 import {
   encodeHTML,
   flexLayout,
@@ -128,7 +129,7 @@ const renderRepoCard = (repo, options = {}) => {
 
    const card = new Card({
      defaultTitle: header.length > 35 ? `${header.slice(0,35)}...` : header,
-     titlePrefixIcon: icons.contribs,
+     titlePrefixIcon: icons.contribs, // Use appropriate icon for contributors
      width: 400,
      height: height,
      border_radius: border_radius || undefined, // Ensure border radius is set correctly
